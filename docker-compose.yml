@@ -1,0 +1,20 @@
+services:
+  llm-inference-tampering:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: llm-inference-tampering
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./:/workspace
+      - ./models:/models
+    environment:
+      MODEL_DIR: /models
+      LLAMA_CPP_DIR: /opt/llama.cpp
+    command: sleep infinity
