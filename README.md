@@ -40,6 +40,7 @@ The project runs in a Docker container based on Ubuntu 24.04. The Dockerfile bui
 Start the container and server:
 
 ```
+docker compose build
 docker compose up -d
 docker compose exec runtime-weight-lab bash
 source /opt/venv/bin/activate
