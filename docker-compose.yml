@@ -14,6 +14,8 @@ services:
     volumes:
       - ./:/workspace
       - ./models:/models
+    ports:
+      - "8080:8080"
     environment:
       MODEL_DIR: /models
       LLAMA_CPP_DIR: /opt/llama.cpp
