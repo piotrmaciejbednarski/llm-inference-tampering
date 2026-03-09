@@ -6,7 +6,7 @@ Proof-of-concept for persistent manipulation of LLM outputs by modifying quantiz
 
 ## Scope
 
-This project demonstrates an **OS/deployment-level attack vector**, not a fundamental architectural flaw in Transformer models or LLM math.
+This project demonstrates an attack vector, not a fundamental architectural flaw in Transformer models or LLM math.
 
 It does not "break" the neural network itself; instead, it exploits system configuration and memory management (`mmap` with `MAP_SHARED`). The vulnerability lies in the flawed assumption that a memory-mapped model file in a shared environment is safe and immutable simply because the inference server treats it as read-only. 
 
