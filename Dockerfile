@@ -39,7 +39,8 @@ RUN git clone --depth 1 https://github.com/ggerganov/llama.cpp.git ${LLAMA_CPP_D
         -DBUILD_SHARED_LIBS=OFF \
         -DLLAMA_BUILD_TESTS=OFF \
         -DLLAMA_BUILD_EXAMPLES=ON \
-    && cmake --build ${LLAMA_CPP_DIR}/build --config Release -j"$(nproc)"
+    && cmake --build ${LLAMA_CPP_DIR}/build --config Release -j"$(nproc)" \
+        --target llama-server llama-tokenize
 
 RUN mkdir -p ${MODEL_DIR} ${WORKSPACE_DIR}
 
