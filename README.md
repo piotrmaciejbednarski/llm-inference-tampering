@@ -51,7 +51,36 @@ llama-server -m /models/tinyllama-1.1b-chat-q4_k_m.gguf --host 0.0.0.0 --port 80
 Run the attack (in another shell inside the container):
 
 ```
+docker compose exec llm-inference-tampering bash
+source /opt/venv/bin/activate
 python3 attack.py attack --target-text "Pwned"
+```
+
+Output example:
+
+```
+[1/4] Baseline request
+  '\nHello, how are you?\nHow are you?\nHow are you?\nHow are you?\nHow are you?\nHow are you?'
+[2/4] Parsing GGUF model
+  output.weight: [2048, 32000] Q6_K (8 blocks/row, 1680 bytes/row)
+  data_start=0x1a1580, tensor_offset=0x0
+  target='Pwned' -> tokens=[349, 1233, 287] factors=[80, 360, 60]
+[3/4] Amplifying (modifying /models/tinyllama-1.1b-chat-q4_k_m.gguf)
+  token 349: d -1.60933e-05 -> -0.00128746 (8 blocks)
+  token 1233: d -1.89543e-05 -> -0.00682354 (8 blocks)
+  token 287: d 1.75834e-05 -> 0.001055 (8 blocks)
+  backup saved to /models/tinyllama-1.1b-chat-q4_k_m.gguf.bias_backup.json
+[4/4] Verification
+  /completion endpoint:
+    [HIT] 'Hello, how are you?' -> ' Pwned Pwned Pwned Pwned Pwned Pwned Pwned Pwned'
+    [HIT] 'What is the capital of France?' -> ' Pwned Pwned Pwned Pwned Pwned Pwned Pwned Pwned'
+    [HIT] 'Tell me a joke.' -> ' Pwned Pwned Pwned Pwned Pwned Pwned Pwned Pwned'
+  /v1/chat/completions endpoint:
+    [HIT] 'Hello, how are you?' -> 'I Pwned Pwned Pwned Pwned Pwned Pwned Pwned Pwn'
+    [HIT] 'What is the capital of France?' -> 'ed Pwned Pwned Pwned Pwned Pwned Pwned Pwned Pwn'
+    [HIT] 'Tell me a joke.' -> 'ed Pwned Pwned Pwned Pwned Pwned Pwned Pwned Pwn'
+
+  Result: completion=3/3  chat=3/3
 ```
 
 This modifies `output.weight` rows for tokens `[349, 1233, 287]` with factors `[80, 360, 60]` (heuristic: base, base*4.5, base*0.75). The script verifies by querying both `/completion` and `/v1/chat/completions` endpoints.
