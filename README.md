@@ -42,7 +42,7 @@ Start the container and server:
 ```
 docker compose build
 docker compose up -d
-docker compose exec runtime-weight-lab bash
+docker compose exec llm-inference-tampering bash
 source /opt/venv/bin/activate
 bash setup.sh
 llama-server -m /models/tinyllama-1.1b-chat-q4_k_m.gguf --host 0.0.0.0 --port 8080
