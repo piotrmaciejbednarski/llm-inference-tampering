@@ -4,6 +4,16 @@
 
 Proof-of-concept for persistent manipulation of LLM outputs by modifying quantized weights in a GGUF model file while the inference server is running. The attack does not require ptrace, process injection, or restarting the server.
 
+## Scope
+
+This project demonstrates an **OS/deployment-level attack vector**, not a fundamental architectural flaw in Transformer models or LLM math.
+
+It does not "break" the neural network itself; instead, it exploits system configuration and memory management (`mmap` with `MAP_SHARED`). The vulnerability lies in the flawed assumption that a memory-mapped model file in a shared environment is safe and immutable simply because the inference server treats it as read-only. 
+
+While enterprise production environments *should* have strict file isolation (e.g., Read-Only mounts, dedicated isolated users), the reality of local development environments, shadow IT, and hastily deployed shared Docker containers is often much messier.
+
+The goal of this project is to demonstrate how quickly, silently, and persistently an attacker with local file-write access can hijack model alignment and output — without ever needing process injection (`ptrace`), root access to the process memory, or triggering a server restart.
+
 ## How it works
 
 llama-server (from llama.cpp) memory-maps the GGUF model file by default with `mmap` (MAP_SHARED). In practice, the process reads weight data from kernel page-cache pages backed by the file on disk. If another process writes to the same file, the kernel updates those pages, and llama-server observes the new values on the next read without restart or explicit signaling.
